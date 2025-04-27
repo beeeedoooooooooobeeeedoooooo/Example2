@@ -1,0 +1,52 @@
+# Slurry Design Calculator
+# Given a percentage of bentonite, this calculates the slurry density (lbm/gal), percent mix (%), and slurry yield (ft³/sack).
+
+# Constants
+CEMENT_WEIGHT = 94  # lbm per sack
+WATER_DENSITY = 8.34  # lbm/gal
+CEMENT_MATRIX_SG = 3.14
+BENTONITE_MATRIX_SG = 2.65
+BASE_WATER_GAL_PER_SACK = 5.19  # adjusted per provided image
+EXTRA_WATER_PERCENT_PER_BENTONITE = 1.3 / 2  # 1.3% divided by 2 as per formula
+
+CEMENT_MATRIX_DENSITY = CEMENT_MATRIX_SG * WATER_DENSITY  # lbm/gal
+BENTONITE_MATRIX_DENSITY = BENTONITE_MATRIX_SG * WATER_DENSITY  # lbm/gal
+
+
+def slurry_design(bentonite_percent):
+    # Calculate bentonite weight
+    bentonite_weight = (bentonite_percent / 100) * CEMENT_WEIGHT
+
+    # Calculate total water requirement
+    adjusted_water_gal = BASE_WATER_GAL_PER_SACK + (EXTRA_WATER_PERCENT_PER_BENTONITE * bentonite_percent)
+    total_water_lb = adjusted_water_gal * WATER_DENSITY
+
+    # Total mass
+    total_mass = CEMENT_WEIGHT + bentonite_weight + total_water_lb
+
+    # Component volumes
+    cement_volume = CEMENT_WEIGHT / CEMENT_MATRIX_DENSITY
+    bentonite_volume = bentonite_weight / BENTONITE_MATRIX_DENSITY
+    water_volume = adjusted_water_gal
+    total_volume = cement_volume + bentonite_volume + water_volume
+
+    # Calculated properties
+    slurry_density = total_mass / total_volume
+    percent_mix = (WATER_DENSITY * adjusted_water_gal) / CEMENT_WEIGHT * 100
+    slurry_yield = total_volume / 7.48  # convert gallons to ft³ (1 ft³ = 7.48 gal)
+
+    return slurry_density, percent_mix, slurry_yield
+
+
+if __name__ == "__main__":
+    try:
+        bentonite_percent = float(input("Enter bentonite percentage (%): "))
+        slurry_density, percent_mix, slurry_yield = slurry_design(bentonite_percent)
+
+        print("\nSlurry Design Results")
+        print(f"Bentonite Percentage: {bentonite_percent:.2f}%")
+        print(f"Slurry Density: {slurry_density:.2f} lbm/gal")
+        print(f"Percent Mix: {percent_mix:.2f}%")
+        print(f"Slurry Yield: {slurry_yield:.2f} ft³ per sack")
+    except ValueError:
+        print("Invalid input. Please enter a numeric value for bentonite percentage.")
